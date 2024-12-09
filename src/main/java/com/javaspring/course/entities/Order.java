@@ -1,23 +1,40 @@
 package com.javaspring.course.entities;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
-import com.javaspring.course.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tb_order")
 public class Order {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Date moment;
-	private OrderStatus orderStatus;
+	
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	private Instant moment;
+	
+	@ManyToOne
+	@JoinColumn(name = "client_id")
+	private User client;
 	
 	public Order() {
 	}
 
-	public Order(Long id, Date moment, OrderStatus orderStatus) {
+	public Order(Long id, Instant moment, User client) {
 		this.id = id;
 		this.moment = moment;
-		this.orderStatus = orderStatus;
+		this.client = client;
 	}
 
 	public Long getId() {
@@ -28,20 +45,20 @@ public class Order {
 		this.id = id;
 	}
 
-	public Date getMoment() {
+	public Instant getMoment() {
 		return moment;
 	}
 
-	public void setMoment(Date moment) {
+	public void setMoment(Instant moment) {
 		this.moment = moment;
 	}
 
-	public OrderStatus getOrderStatus() {
-		return orderStatus;
+	public User getClient() {
+		return client;
 	}
 
-	public void setOrderStatus(OrderStatus orderStatus) {
-		this.orderStatus = orderStatus;
+	public void setClient(User client) {
+		this.client = client;
 	}
 
 	@Override
@@ -59,9 +76,5 @@ public class Order {
 			return false;
 		Order other = (Order) obj;
 		return Objects.equals(id, other.id);
-	}
-	
-	public double total() {
-		return 0.0;
 	}
 }
