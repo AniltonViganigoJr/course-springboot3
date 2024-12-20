@@ -3,7 +3,6 @@ package com.javaspring.course.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,6 +12,8 @@ import com.javaspring.course.entities.User;
 import com.javaspring.course.repositories.UserRepository;
 import com.javaspring.course.services.exceptions.DatabaseException;
 import com.javaspring.course.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -44,9 +45,13 @@ public class UserService {
 	}
 
 	public User update(Long id, User user) {
-		User entity = userRepository.getReferenceById(id);
-		updateData(entity, user);
-		return userRepository.save(entity);
+		try {
+			User entity = userRepository.getReferenceById(id);
+			updateData(entity, user);
+			return userRepository.save(entity);
+		}catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateData(User entity, User user) {
